@@ -1,0 +1,146 @@
+# Python
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+*.pyo
+*.pyd
+__pycache__/
+dist/
+build/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.mo
+*.pickle
+*.coverage
+.coverage.*
+*.cover
+.hypothesis/
+*.pytest_cache/
+htmlcov/
+.tox/
+.pytest_cache/
+cache/
+scrapy.cfg
+
+# Django Migrations
+**/migrations/**
+!**/migrations/__init__.py
+
+# Environment Variables
+.env
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django static files
+/static/
+staticfiles/
+static/
+
+# Django media files
+/media/
+media/
+
+# MacOS
+.DS_Store
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Pycharm
+.idea/
+*.iml
+
+# Docker
+docker-compose.override.yml
+
+# Byte-compiled / optimized / DLL files
+*.$py.class
+
+# Distribution / packaging
+.Python
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+
+# Unit test / coverage reports
+.nox/
+.cache
+nosetests.xml
+coverage.xml
+*.py,cover
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Sphinx documentation
+docs/_build/
+docsrc/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# celery beat schedule file
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# profiling data
+.prof
+
+# local configurations
+*.local
+
+# SQL files
+*.sql
+
+# Windows specific files
+Thumbs.db
+Desktop.ini
