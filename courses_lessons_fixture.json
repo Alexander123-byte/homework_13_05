@@ -1,0 +1,22 @@
+[
+    {
+        "model": "materials.course",
+        "pk": 1,
+        "fields": {
+            "title": "Python for Beginners",
+            "preview_image": null,
+            "description": "A course for beginners in Python."
+        }
+    },
+    {
+        "model": "materials.lesson",
+        "pk": 1,
+        "fields": {
+            "course": 1,
+            "title": "Introduction to Python",
+            "description": "An introductory lesson on Python programming.",
+            "preview_image": null,
+            "video_url": "http://example.com/video1"
+        }
+    }
+]

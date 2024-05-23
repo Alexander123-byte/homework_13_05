@@ -1,0 +1,15 @@
+[
+    {
+        "model": "users.user",
+        "pk": 1,
+        "fields": {
+            "email": "testuser@example.com",
+            "phone": "1234567890",
+            "city": "Test City",
+            "avatar": null,
+            "password": "pbkdf2_sha256$260000$n9l5Y7fAx1eT$XgOG5hM8EViw8R5Y9RuI/0kF0eOeDle7yCvOOW7+j2k=",
+            "is_staff": false,
+            "is_active": true
+        }
+    }
+]
