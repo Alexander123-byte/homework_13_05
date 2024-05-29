@@ -3,9 +3,8 @@ from rest_framework.routers import SimpleRouter
 
 from materials.views import (CourseViewSet, LessonCreateAPIView, LessonListAPIView, LessonRetrieveAPIView,
                              LessonUpdateAPIView, LessonDestroyAPIView)
-from materials.apps import MaterialsConfig
 
-app_name = MaterialsConfig.name
+app_name = 'materials'
 
 router = SimpleRouter()
 router.register("", CourseViewSet)
