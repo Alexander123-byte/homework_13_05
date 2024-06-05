@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, \
     get_object_or_404
@@ -82,3 +83,8 @@ class SubscriptionAPIView(APIView):
             message = "Подписка добавлена"
 
         return Response({"message": message})
+
+    def delete(self, request, course_id):
+        subscription = get_object_or_404(Subscription, user=request.user, course_id=course_id)
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
