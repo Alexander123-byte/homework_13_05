@@ -2,12 +2,15 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from materials.models import Course, Lesson
 from users.models import Payment
+from materials.validators import validate_youtube_url
 
 
 class LessonSerializer(ModelSerializer):
+    video_url = serializers.URLField(validators=[validate_youtube_url])
+
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'description', 'preview_image', 'video_url']
+        fields = ['id', 'title', 'description', 'preview_image', 'video_url', 'course']
 
 
 class CourseSerializer(ModelSerializer):
