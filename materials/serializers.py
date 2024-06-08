@@ -10,7 +10,7 @@ class LessonSerializer(ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'description', 'preview_image', 'video_url', 'course']
+        fields = ["id", "title", "description", "preview_image", "video_url", "course"]
 
 
 class CourseSerializer(ModelSerializer):
@@ -20,13 +20,21 @@ class CourseSerializer(ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'preview_image', 'description', 'lessons', 'lessons_count', 'is_subscribed']
+        fields = [
+            "id",
+            "title",
+            "preview_image",
+            "description",
+            "lessons",
+            "lessons_count",
+            "is_subscribed",
+        ]
 
     def get_lessons_count(self, obj):
         return obj.lessons.count()
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request', None)
+        request = self.context.get("request", None)
         if request and request.user.is_authenticated:
             return Subscription.objects.filter(user=request.user, course=obj).exists()
         return False
@@ -35,10 +43,18 @@ class CourseSerializer(ModelSerializer):
 class PaymentSerializer(ModelSerializer):
     class Meta:
         model = Payment
-        fields = ['id', 'user', 'payment_date', 'paid_course', 'paid_lesson', 'amount', 'payment_method']
+        fields = [
+            "id",
+            "user",
+            "payment_date",
+            "paid_course",
+            "paid_lesson",
+            "amount",
+            "payment_method",
+        ]
 
 
 class SubscriptionSerializer(ModelSerializer):
     class Meta:
         model = Subscription
-        fields = ['id', 'user', 'course']
+        fields = ["id", "user", "course"]

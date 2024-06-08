@@ -8,7 +8,9 @@ from users.models import User
 class MaterialsApiTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(email="user@example.com", password="password")
-        self.moderator = User.objects.create(email="moderator@example.com", password="password")
+        self.moderator = User.objects.create(
+            email="moderator@example.com", password="password"
+        )
         mod_group = Group.objects.create(name="moders")
         self.moderator.groups.add(mod_group)
 
@@ -22,7 +24,7 @@ class MaterialsApiTestCase(APITestCase):
             title="Test Lesson",
             course=self.course,
             owner=self.user,
-            video_url='https://www.youtube.com/watch?v=test'
+            video_url="https://www.youtube.com/watch?v=test",
         )
 
     # CRUD Tests for Lessons
@@ -32,7 +34,7 @@ class MaterialsApiTestCase(APITestCase):
             "course": self.course.id,
             "title": "New Lesson",
             "description": "New Lesson Description",
-            "video_url": "https://www.youtube.com/watch?v=newlesson"
+            "video_url": "https://www.youtube.com/watch?v=newlesson",
         }
         response = self.client.post("/materials/lessons/create/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -47,17 +49,19 @@ class MaterialsApiTestCase(APITestCase):
             title="Test Lesson",
             course=course,
             owner=self.moderator,
-            video_url='https://www.youtube.com/watch?v=test'
+            video_url="https://www.youtube.com/watch?v=test",
         )
 
         data = {
             "course": course.id,
             "title": "Updated Lesson Title",
             "description": "Updated Lesson Description",
-            "video_url": "https://www.youtube.com/watch?v=updated"
+            "video_url": "https://www.youtube.com/watch?v=updated",
         }
 
-        response = self.client.put(f"/materials/lessons/{lesson.id}/update/", data, format="json")
+        response = self.client.put(
+            f"/materials/lessons/{lesson.id}/update/", data, format="json"
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -72,10 +76,14 @@ class MaterialsApiTestCase(APITestCase):
         data = {"course_id": self.course.id}
         response = self.client.post("/materials/subscriptions/", data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(Subscription.objects.filter(user=self.user, course=self.course).exists())
+        self.assertTrue(
+            Subscription.objects.filter(user=self.user, course=self.course).exists()
+        )
 
     def test_unsubscribe_from_course(self):
         Subscription.objects.create(user=self.user, course=self.course)
         response = self.client.delete(f"/materials/subscriptions/{self.course.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Subscription.objects.filter(user=self.user, course=self.course).exists())
+        self.assertFalse(
+            Subscription.objects.filter(user=self.user, course=self.course).exists()
+        )

@@ -1,7 +1,15 @@
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, \
-    get_object_or_404
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+    get_object_or_404,
+)
 from rest_framework.permissions import IsAuthenticated
 from materials.models import Course, Lesson, Subscription
 from materials.paginations import CustomPagination
@@ -11,6 +19,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 
+@method_decorator(name='list', decorator=swagger_auto_schema(
+    operation_description='description from swagger_auto_schema via method_decorator'
+))
 class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -20,11 +31,11 @@ class CourseViewSet(ModelViewSet):
         serializer.save(owner=self.request.user)
 
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action == "create":
             self.permission_classes = [IsAuthenticated, IsNotModer]
-        elif self.action == 'destroy':
+        elif self.action == "destroy":
             self.permission_classes = [IsAuthenticated, IsOwnerOrModer, IsNotModer]
-        elif self.action in ['update', 'partial_update', 'retrieve']:
+        elif self.action in ["update", "partial_update", "retrieve"]:
             self.permission_classes = [IsAuthenticated, IsOwnerOrModer]
         else:
             self.permission_classes = [IsAuthenticated]
@@ -85,6 +96,8 @@ class SubscriptionAPIView(APIView):
         return Response({"message": message})
 
     def delete(self, request, course_id):
-        subscription = get_object_or_404(Subscription, user=request.user, course_id=course_id)
+        subscription = get_object_or_404(
+            Subscription, user=request.user, course_id=course_id
+        )
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
