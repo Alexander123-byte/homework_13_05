@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.permissions import AllowAny
 from rest_framework.routers import DefaultRouter
 
-from .views import PaymentViewSet
+from .views import PaymentViewSet, PaymentCreateAPIView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -32,4 +32,5 @@ urlpatterns = [
         TokenRefreshView.as_view(permission_classes=(AllowAny,)),
         name="token_refresh",
     ),
+    path("payments/", PaymentCreateAPIView.as_view(), name="payment"),
 ]
