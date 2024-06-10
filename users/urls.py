@@ -13,7 +13,7 @@ from users.views import UserCreateAPIView
 app_name = "users"
 
 router = DefaultRouter()
-router.register(r"payments", PaymentViewSet)
+# router.register(r"payments", PaymentViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
