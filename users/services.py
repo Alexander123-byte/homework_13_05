@@ -4,12 +4,12 @@ from django.conf import settings
 stripe.api_key = settings.STRIPE_API_KEY
 
 
-def create_stripe_price(amount):
-    """Создает цену в Stripe."""
+def create_stripe_price(amount, product_name):
+    """Создает цену в Stripe для указанного продукта."""
     price = stripe.Price.create(
         currency="rub",
         unit_amount=int(amount * 100),
-        product_data={"name": "Payment"},
+        product_data={"name": product_name},
     )
     return price
 

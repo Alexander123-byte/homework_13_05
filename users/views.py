@@ -18,6 +18,20 @@ class PaymentViewSet(ModelViewSet):
     ordering_fields = ["payment_date"]
     ordering = ["payment_date"]
 
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+        product_name = "Unknown Product"
+        if payment.paid_course:
+            product_name = payment.paid_course
+        elif payment.paid_lesson:
+            product_name = payment.paid_lesson
+
+        price = create_stripe_price(payment.amount, product_name)
+        session_id, payment_link = create_stripe_session(price)
+        payment.session_id = session_id
+        payment.link = payment_link
+        payment.save()
+
 
 class UserCreateAPIView(CreateAPIView):
     serializer_class = UserSerializer
@@ -28,16 +42,3 @@ class UserCreateAPIView(CreateAPIView):
         user = serializer.save(is_active=True)
         user.set_password(user.password)
         user.save()
-
-
-class PaymentCreateAPIView(CreateAPIView):
-    serializer_class = PaymentSerializer
-    queryset = Payment.objects.all()
-
-    def perform_create(self, serializer):
-        payment = serializer.save(user=self.request.user)
-        price = create_stripe_price(payment.amount)
-        session_id, payment_link = create_stripe_session(price)
-        payment.session_id = session_id
-        payment.link = payment_link
-        payment.save()
