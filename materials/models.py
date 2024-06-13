@@ -29,6 +29,11 @@ class Course(models.Model):
         verbose_name="Владелец",
         help_text="Укажите владельца курса",
     )
+    last_updated = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Последнее обновление",
+        help_text="Время последнего обновления курса"
+    )
 
     def __str__(self):
         return self.title
@@ -70,6 +75,11 @@ class Lesson(models.Model):
         verbose_name="Владелец",
         help_text="Укажите владельца урока",
     )
+    last_updated = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Последнее обновление",
+        help_text="Время последнего обновления урока",
+    )
 
     def __str__(self):
         return self.title
@@ -81,9 +91,20 @@ class Lesson(models.Model):
 
 class Subscription(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь"
     )
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="Курс")
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        verbose_name="Курс"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата подписки",
+        help_text="Дата и время создания подписки",
+    )
 
     def __str__(self):
         return f"{self.user} -> {self.course}"

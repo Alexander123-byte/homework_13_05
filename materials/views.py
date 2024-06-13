@@ -18,6 +18,8 @@ from users.permissions import IsNotModer, IsOwnerOrModer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .tasks import send_update_email
+from django.utils import timezone
+from datetime import timedelta
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
@@ -51,14 +53,15 @@ class CourseUpdateAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
 
-            # Получение подписчиков курса
-            subscribes = Subscription.objects.filter(course=course)
-            recipient_list = [sub.user.email for sub in subscribes]
+            if timezone.now() - course.last_updated > timedelta(hours=4):
+                # Получение подписчиков курса
+                subscribes = Subscription.objects.filter(course=course)
+                recipient_list = [sub.user.email for sub in subscribes]
 
-            # Отправка email
-            subject = "Course Updated"
-            message = f"The course '{course.title}' has been updated."
-            send_update_email.delay(recipient_list, subject, message)
+                # Отправка email
+                subject = "Course Updated"
+                message = f"The course '{course.title}' has been updated."
+                send_update_email.delay(recipient_list, subject, message)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -90,6 +93,31 @@ class LessonUpdateAPIView(UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrModer]
+
+    def post(self, request, course_pk, lesson_pk, *args, **kwargs):
+        course = get_object_or_404(Course, pk=course_pk)
+        lesson = get_object_or_404(Lesson, pk=lesson_pk, course=course)
+        serializer = LessonSerializer(lesson, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            # Проверка времени последнего обновления курса
+            if timezone.now() - course.last_updated > timedelta(hours=4):
+                course.last_updated = timezone.now()
+                course.save()
+
+                # Получение подписчиков курса
+                subscribers = Subscription.objects.filter(course=course)
+                recipient_list = [sub.user.email for sub in subscribers]
+
+                # Отправка email
+                subject = 'Course Updated'
+                message = f'The course "{course.title}" has been updated.'
+                send_update_email.delay(subject, message, recipient_list)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LessonDestroyAPIView(DestroyAPIView):
