@@ -181,7 +181,11 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_BEAT_SCHEDULE = {
     'example-task': {
         'task': 'your_app.tasks.example_task',
-        'schedule': crontab(minute=0, hour=0),  # запускать каждый день в полночь
+        'schedule': crontab(minute=0, hour=0),
+    },
+    'lock_inactive_users_task': {
+        'task': 'users.tasks.lock_inactive_users',
+        'schedule': crontab(hour=0, minute=0),
     },
 }
 
