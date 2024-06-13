@@ -17,6 +17,7 @@ from materials.serializers import CourseSerializer, LessonSerializer
 from users.permissions import IsNotModer, IsOwnerOrModer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .tasks import send_update_email
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
@@ -40,6 +41,27 @@ class CourseViewSet(ModelViewSet):
         else:
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
+
+
+class CourseUpdateAPIView(APIView):
+    def post(self, request, pk, *args, **kwargs):
+        course = get_object_or_404(Course, pk=pk)
+        serializer = CourseSerializer(course, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            # Получение подписчиков курса
+            subscribes = Subscription.objects.filter(course=course)
+            recipient_list = [sub.user.email for sub in subscribes]
+
+            # Отправка email
+            subject = "Course Updated"
+            message = f"The course '{course.title}' has been updated."
+            send_update_email.delay(recipient_list, subject, message)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LessonCreateAPIView(CreateAPIView):
