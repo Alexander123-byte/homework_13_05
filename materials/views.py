@@ -2,6 +2,13 @@ from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
+from materials.models import Course, Lesson, Subscription
+from materials.paginations import CustomPagination
+from materials.serializers import CourseSerializer, LessonSerializer
+from users.permissions import IsNotModer, IsOwnerOrModer
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
@@ -10,13 +17,6 @@ from rest_framework.generics import (
     DestroyAPIView,
     get_object_or_404,
 )
-from rest_framework.permissions import IsAuthenticated
-from materials.models import Course, Lesson, Subscription
-from materials.paginations import CustomPagination
-from materials.serializers import CourseSerializer, LessonSerializer
-from users.permissions import IsNotModer, IsOwnerOrModer
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from .tasks import send_update_email
 from django.utils import timezone
 from datetime import timedelta
@@ -33,6 +33,10 @@ class CourseViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        send_update_email.delay(instance.id)
+
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = [IsAuthenticated, IsNotModer]
@@ -43,28 +47,6 @@ class CourseViewSet(ModelViewSet):
         else:
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
-
-
-class CourseUpdateAPIView(APIView):
-    def post(self, request, pk, *args, **kwargs):
-        course = get_object_or_404(Course, pk=pk)
-        serializer = CourseSerializer(course, data=request.data, partial=True)
-
-        if serializer.is_valid():
-            serializer.save()
-
-            if timezone.now() - course.last_updated > timedelta(hours=4):
-                # Получение подписчиков курса
-                subscribes = Subscription.objects.filter(course=course)
-                recipient_list = [sub.user.email for sub in subscribes]
-
-                # Отправка email
-                subject = "Course Updated"
-                message = f"The course '{course.title}' has been updated."
-                send_update_email.delay(recipient_list, subject, message)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LessonCreateAPIView(CreateAPIView):
