@@ -17,7 +17,7 @@ from rest_framework.generics import (
     DestroyAPIView,
     get_object_or_404,
 )
-from .tasks import send_update_email
+from .tasks import send_course_update_notification
 from django.utils import timezone
 from datetime import timedelta
 
@@ -35,7 +35,7 @@ class CourseViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         instance = serializer.save()
-        send_update_email.delay(instance.id)
+        send_course_update_notification.delay(instance.id)
 
     def get_permissions(self):
         if self.action == "create":
@@ -96,7 +96,7 @@ class LessonUpdateAPIView(UpdateAPIView):
                 # Отправка email
                 subject = 'Course Updated'
                 message = f'The course "{course.title}" has been updated.'
-                send_update_email.delay(subject, message, recipient_list)
+                send_course_update_notification.delay(subject, message, recipient_list)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
